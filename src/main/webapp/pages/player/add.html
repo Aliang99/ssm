@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>添加赛程信息</title>
+    <script type="text/javascript" src="../../js/jquery-1.11.1.js"></script>
+    <script type="text/javascript" src="../../js/bootstrap.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../css/bootstrap.css"></link>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"></link>
+    <style>
+        label span{color: #ff0000; padding-right: 5px;}
+    </style>
+</head>
+
+<body>
+<h2>添加球员</h2>
+<form id="myForm" class="form-horizontal">
+    <div class="form-group">
+        <label class="col-sm-1 control-label">名称</label>
+        <div class="col-sm-9">
+            <input required="required" name="playerName" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">编号</label>
+        <div class="col-sm-9">
+            <input name="playerNum" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">位置</label>
+        <div class="col-sm-9">
+            <input required="" name="location" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">生日</label>
+        <div class="col-sm-9">
+            <input name="birthday" class="form-control" type="date"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">国籍</label>
+        <div class="col-sm-9">
+            <input required="" name="nationality" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">身高</label>
+        <div class="col-sm-9">
+            <input required="" name="height" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">体重</label>
+        <div class="col-sm-9">
+            <input required="" name="weight" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">薪水</label>
+        <div class="col-sm-9">
+            <input required="" name="salary" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">所在球队</label>
+        <div class="col-sm-9">
+            <input required="" name="teamName" class="form-control" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-1 control-label">服役状态</label>
+        <div class="col-sm-2">
+            <select name="status" class="form-control">
+                <option value="-1">请选择类型</option>
+                <option value="0">退役</option>
+                <option value="1">在职</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label"></label>
+        <div class="col-sm-9">
+            <button id="btnAdd" type="button" class="btn btn-sm btn-info">提&nbsp;交</button>
+            <button type="reset"  class="btn btn-sm btn-warning">重&nbsp;置</button>
+        </div>
+    </div>
+</form>
+</body>
+</html>
+<script>
+
+    $(function () {
+        $("#btnAdd").click(function () {
+            $.ajax({
+                type: "POST",//这里必须写POST
+                url: "/player/insertPlayer",
+                data: $("#myForm").serialize(),
+                dataType:"json",
+                success: function(vo){
+
+                    if(vo.status==200) {
+                        alert("新增成功");
+                        window.location.href = "/pages/player/list.html";
+                    }else{
+                        alert("新增失败！"+vo.msg);
+                    }
+                }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <!--     导入数据库配置信息-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <!--    扫描包-->
+    <context:component-scan base-package="com.kkb.pojo,com.kkb.mapper,com.kkb.service,com.kkb.Exception,com.kkb.Interceptor,com.kkb.ExceptionHandle"/>
+    <!--    spring整合mybatis-->
+    <!--   创建数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+    <!--   创建sqlSession工厂-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--   配置数据源-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--  指定mybatis文件位置-->
+        <property name="configLocation" value="classpath:mybatis.xml"/>
+        <!--  为实体类包取别名-->
+        <property name="typeAliasesPackage" value="com.kkb.pojo"/>
+        <!--   指定映射文件位置以及后缀-->
+        <!--        <property name="mapperLocations" value="com/kkb/mapper/*.xml"/>-->
+        <!--   配置分页插件-->
+        <property name="plugins">
+            <array>
+                <bean class="com.github.pagehelper.PageInterceptor">
+                    <property name="properties">
+                        <value>reasonable=true</value>
+                    </property>
+                </bean>
+            </array>
+        </property>
+    </bean>
+    <!--配置Mapper接口所在的包名
+        spring自动查询指定包下的mapper
+        有了MapperScannerConfigurer就不需要我们去为每个映射接口去声明一个bean了。
+        大大缩减了开发 的效率。-->
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--   指定sqlSessionFactory-->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!--   指定需要扫描的包-->
+        <property name="basePackage" value="com.kkb.mapper"/>
+    </bean>
+
+    <!--    配置事务-->
+    <tx:annotation-driven/>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--        指定开启事务管理的数据源-->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+</beans>

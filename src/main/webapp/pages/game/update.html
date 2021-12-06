@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>更新赛程信息</title>
+    <script type="text/javascript" src="../../js/jquery-1.11.1.js"></script>
+    <script type="text/javascript" src="../../js/bootstrap.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../css/bootstrap.css"></link>
+    <link rel="stylesheet" type="text/css" href="../../css/style.css"></link>
+    <style>
+        label span{color: #ff0000; padding-right: 5px;}
+    </style>
+</head>
+
+<body>
+<h2>更新赛程</h2>
+<form id="myForm" class="form-horizontal">
+    <div class="form-group">
+    <label class="col-sm-1 control-label">赛程ID</label>
+    <div class="col-sm-9">
+        <input name="gameId"  type="text" disabled/>
+    </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">主队名称</label>
+        <div class="col-sm-9">
+            <input required="required" name="homeTeam" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">主队得分</label>
+        <div class="col-sm-9">
+            <input name="homeTeamScore" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">客队名称</label>
+        <div class="col-sm-9">
+            <input required="" name="visitingTeam" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">客队得分</label>
+        <div class="col-sm-9">
+            <input name="visitingTeamScore" class="form-control" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-1 control-label">比赛时间</label>
+        <div class="col-sm-2">
+            <input name="gameDate" class="form-control" type="date"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">比赛类型</label>
+        <div class="col-sm-2">
+            <select name="type" class="form-control">
+                <option value="-1">请选择比赛类型</option>
+                <option value="1">季前赛</option>
+                <option value="2">常规赛</option>
+                <option value="3">季后赛</option>
+                <option value="4">总决赛</option>
+                <option value="5">全明星赛</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">赛程情况</label>
+        <div class="col-sm-2">
+            <select name="status" class="form-control">
+                <option value="-1">请选择比赛类型</option>
+                <option value="0">正常</option>
+                <option value="1">取消</option>
+                <option value="2">延迟</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label"></label>
+        <div class="col-sm-9">
+            <button id="btnUpdate" type="button" class="btn btn-sm btn-info">提&nbsp;交</button>
+            <button type="reset"  class="btn btn-sm btn-warning">重&nbsp;置</button>
+        </div>
+    </div>
+</form>
+</body>
+</html>
+<script>
+    String.prototype.GetValue= function(para) {
+        let reg = new RegExp("(^|&)"+ para +"=([^&]*)(&|$)");
+        let r = this.substr(this.indexOf("\?")+1).match(reg);
+        if (r!=null) return unescape(r[2]); return null;
+    }
+    $(function () {
+        //根据地址获取gameId,如果null则执行增加，否则执行更新
+        let url = document.location.toString();//获取URL
+        let gameId=url.GetValue("gameId");
+        let pageNum=url.GetValue("pageNum");
+        let pageSize=url.GetValue("pageSize");
+        //alert(gameId);
+        //根据id查询要更新的球队信息并回显到页面
+        queryById(gameId);
+        //提交按钮的单击事件--实现真正的更新
+        $("#btnUpdate").click(function () {
+            $.ajax({
+                type: "POST",//这里必须写POST
+                url: "/game/"+gameId,
+                data: $("#myForm").serialize()+"&_method=PUT",
+                dataType:"json",
+                success: function(vo){
+
+                    if(vo.status==200) {
+                        alert("更新成功");
+                        window.location.href = "/pages/game/list.html?pageNum="+pageNum+"&pageSize="+pageSize;
+                    }else{
+                        alert("更新失败！"+vo.msg);
+                    }
+                }
+            });
+        });
+    });
+    function queryById(gameId) {
+        $.ajax({
+            type: "GET",
+            url: "/game/"+gameId, //RESTful风格的API定义
+            data: "",
+            success: function (vo) {
+                let obj=vo.obj;
+                let gameId=obj.gameId;
+                let homeTeam=obj.homeTeam.chineseName;
+                let visitingTeam=obj.visitingTeam.chineseName;
+                let homeTeamScore=obj.homeTeamScore;
+                let visitingTeamScore=obj.visitingTeamScore;
+                let type=obj.typeId;
+                let status=obj.status;
+                let gameDate=obj.gameDate;
+
+                $("input[name='gameId']").val(gameId);
+                $("input[name='homeTeam']").val(homeTeam);
+                $("input[name='visitingTeam']").val(visitingTeam);
+                $("input[name='homeTeamScore']").val(homeTeamScore);
+                $("input[name='visitingTeamScore']").val(visitingTeamScore);
+                $("select[name='type']").val(type);
+                $("input[name='gameDate']").val(gameDate);
+                $("select[name='status']").val(status);
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>Signin Template for Bootstrap</title>
+    <script type="text/javascript" src="../../js/jquery-1.11.1.js"></script>
+    <script type="text/javascript" src="../../js/bootstrap.js" ></script>
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.25/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="https://cdn.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.25/examples/signin/signin.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <form class="form-signin" id="myForm">
+        <h2 class="form-signin-heading text-center">登录</h2>
+        <label for="inputEmail" class="sr-only">邮箱地址</label>
+        <input name="loginName" type="email" id="inputEmail" class="form-control" placeholder="邮箱地址" required autofocus>
+        <label for="inputPassword" class="sr-only">密码</label>
+        <input name="adminPwd" type="password" id="inputPassword" class="form-control" placeholder="密码" required>
+        <button class="btn btn-lg btn-primary btn-block" type="button">登录</button>
+    </form>
+
+</div>
+<script>
+    if (top.location.href.split("/")[5]!="login.html")
+            top.location.href="/pages/admin/login.html";
+    $(function(){
+        $(".btn-primary").click(function(){
+            $.ajax({
+                type: "GET",
+                url: "/admin/login",
+                data: $("#myForm").serialize(),//主要是分页和多条件参数数据
+                dataType:"json",
+                success: function(vo){
+                    if (vo.status==200) {
+                        alert("登录成功！");
+                        window.location.href = "/pages/index.html?petName=" + vo.obj.petName + "&roleId=" + vo.obj.roleId+"&loginName="+vo.obj.loginName;
+                    }
+                    else if (vo.status==202){
+                        alert(vo.msg);
+                    }
+                }
+            });
+        });
+
+
+    });
+
+</script>
+</body>
+</html>
